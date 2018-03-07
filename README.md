@@ -14,6 +14,10 @@ True
 
 ## Running
 
+### Index
 `python index.py -i directory-of-documents -d dictionary-file -p postings-file`
 `python index.py -i .../nltk_data/corpora/reuters/training/ -d dictionary.txt -p postings.txt`
 `python index.py -i /home/course/cs3245/nltk_data/corpora/reuters/training/ -d dictionary.txt -p postings.txt`
+
+### Search
+`python search.py -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results`
