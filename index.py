@@ -14,6 +14,9 @@ except:
 
 ps = PorterStemmer()
 
+# Term that will return all documents
+global_term = ''
+
 # returns tuples of training filepaths and their corresponding ids from a directory
 def get_training_filepaths_and_ids(directory_of_documents, limit=None):
   filenames_all = []
@@ -48,7 +51,7 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
 
   posting_lists = {}
 
-  posting_lists[''] = PostingList('')
+  posting_lists[global_term] = PostingList(global_term)
 
   for training_filepath_and_id in training_filepaths_and_ids:
     training_filepath, id = training_filepath_and_id
@@ -59,7 +62,7 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
         posting_lists[term] = PostingList(term)
       posting_lists[term].addDocument(document)
 
-    posting_lists[''].addDocument(document)
+    posting_lists[global_term].addDocument(document)
   
   return posting_lists
 

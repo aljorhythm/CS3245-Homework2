@@ -1,9 +1,13 @@
 from file_reader import FileReader
 import string
+from index import global_term
 
 # operator and precedence
 # larger number is higher precedence
 query_operators = {
+  '(' : 3,
+  ')' : 3,
+  'NOT' : 2,
   'AND' : 1,
   'OR' : 0
 }
@@ -45,6 +49,34 @@ def query_or(posting_list_1, posting_list_2):
       answer.append(posting_1_compare)
       posting_1_compare = posting_list_1.nextInt()
 
+  return answer
+
+# generic or operation of two posting lists
+# posting_list_2 is global list
+# posting_list_1 is subset
+# returns all elements in global list but not in subset
+# returns a list
+def query_not(posting_list_1, posting_list_2):
+  posting_1_compare = posting_list_1.nextInt()
+  posting_2_compare = posting_list_2.nextInt()
+
+  answer = []
+
+  while posting_1_compare != None and posting_2_compare != None:
+    if posting_1_compare == posting_2_compare:
+      posting_1_compare = posting_list_1.nextInt()
+      posting_2_compare = posting_list_2.nextInt()
+    else:
+      if posting_1_compare > posting_2_compare:
+        answer.append(posting_2_compare)        
+        posting_2_compare = posting_list_2.nextInt()
+      else:
+        posting_1_compare = posting_list_1.nextInt()
+
+  while posting_2_compare != None:
+    answer.append(posting_2_compare)
+    posting_2_compare = posting_list_2.nextInt()
+        
   return answer
 
 # generic and operation of two posting lists
@@ -96,13 +128,16 @@ class Query():
     return file_reader.getLineReader(line_number)
     
   # generic operation, handles automatically if operands(s) are token or result
-  def operation(self, operand_1, operator, operand_2):
+  def operation(self, operand_1, operator, operand_2=None):
     operand_1 = self.operandToPostingList(operand_1)
+    operand_2 = global_term if operator.upper() == "NOT" else operand_2
     operand_2 = self.operandToPostingList(operand_2)
     if operator.lower() == 'and':
       return query_and(operand_1, operand_2)  
     elif operator.lower() == 'or':
       return query_or(operand_1, operand_2)
+    elif operator.lower() == 'not':
+      return query_not(operand_1, operand_2)
     else:
       assert False, operator
 
@@ -135,42 +170,41 @@ class Query():
 
       is_operator = operator_precedence != None
       is_parenthesis = unit_is_parenthesis(operand_or_operator)
-      is_operand = not is_operator and not is_parenthesis
+      is_operand = not is_operator
 
       if is_operand:
         operands.append(operand_or_operator)
       elif operand_or_operator == '(':
         operators.append(operand_or_operator)
-      elif is_operator:
+      elif is_operator and not is_parenthesis:
         while True:
           operators_len = len(operators)
-          if operators_len == 0 or (operators_len > 0 and (unit_is_parenthesis(operators[-1]) or get_operator_precedence(operators[-1]) < operator_precedence)):
+          if operators_len == 0 or (operators_len > 0 and get_operator_precedence(operators[-1]) >= operator_precedence):
             operators.append(operand_or_operator)
             break
           operator = operators.pop()
           operand_1 = operands.pop()
-          operand_2 = operands.pop()
+          operand_2 = operands.pop() if operator.upper() != "NOT" else None
           calculation = self.operation(operand_1, operator, operand_2)
           operands.append(calculation)
       elif operand_or_operator == ')':
-        while len(operands) > 1:
-          if len(operators) > 0 and get_operator_precedence(operators[-1]) < operator_precedence:
-            break
-          if len(operators) > 0 and unit_is_parenthesis(operators[-1]):
-            operators.pop()
+        while True:
+          if operators_len == 0 or (operators_len > 0 and get_operator_precedence(operators[-1]) >= operator_precedence):
             break
           operator = operators.pop()
           operand_1 = operands.pop()
-          operand_2 = operands.pop()
+          operand_2 = operands.pop() if operator.upper() != "NOT" else None
           calculation = self.operation(operand_1, operator, operand_2)
           operands.append(calculation)
       
       operand_or_operator = ""
 
-    while len(operators) > 0 and len(operands) > 1:
+    while len(operators) > 0:
         operator = operators.pop()
+        if operator == '(':
+          continue
         operand_1 = operands.pop()
-        operand_2 = operands.pop()
+        operand_2 = operands.pop() if operator.upper() != "NOT" else None
         calculation = self.operation(operand_1, operator, operand_2)
         operands.append(calculation)
 
@@ -185,7 +219,7 @@ if __name__ == "__main__":
 
   filename = 'test_postings.txt'
   file_reader = FileReader(filename)
-  terms = [('x', 4), ('y', 3), ('z', 2), ('third', 3), ('fourth', 3), ('fifth', 2)]
+  terms = [('x', 4), ('y', 3), ('z', 2), ('third', 3), ('fourth', 3), ('fifth', 2), ('', 10)]
   terms = dictionary_list_to_dict(terms)
 
   query_string = 'x and y'
@@ -197,13 +231,20 @@ if __name__ == "__main__":
   assert query.getDocumentIds() == [1, 3, 4, 6, 8, 9], query.getDocumentIds()
 
   query_string = '(third or fourth) and fifth'
+  print query_string
+  
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 6], query.getDocumentIds()
 
-  query_string = 'fifth and (third or fourth)'
+  query_string = 'fifth and (third or fourth)'  
+  print query_string
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 6], query.getDocumentIds()
 
   query_string = 'fifth or z and (third or fourth)'
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 4, 6], query.getDocumentIds()
+
+  query_string = 'not x'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [2, 3, 5, 7, 8, 10], query.getDocumentIds()
