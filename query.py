@@ -8,7 +8,7 @@ query_operators = {
   'OR' : 0
 }
 
-# Utility so that we can use merge algo on a list
+# Utility so that we can use merge algo on a list of integers
 class NextableIntList():
   def __init__(self, ints):
     self.ints = ints
@@ -111,6 +111,7 @@ class Query():
     return self.results
 
   # execute query
+  # shunting algo
   # https://stackoverflow.com/questions/13421424/how-to-evaluate-an-infix-expression-in-just-one-scan-using-stacks
   def executeQuery(self):
     operands = []
@@ -173,7 +174,7 @@ class Query():
         calculation = self.operation(operand_1, operator, operand_2)
         operands.append(calculation)
 
-    assert len(operands) == 1, "Syntax alr"
+    assert len(operands) == 1, "Syntax wrong"
     self.results = operands[0]
 
 if __name__ == "__main__":

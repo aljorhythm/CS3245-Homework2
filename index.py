@@ -1,3 +1,5 @@
+# indexing script
+
 import argparse
 import os
 from itertools import chain
@@ -44,18 +46,18 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
   posting_lists = {}
   for training_filepath_and_id in training_filepaths_and_ids:
     training_filepath, id = training_filepath_and_id
-    tokens = terms_from_file(training_filepath)
+    terms = terms_from_file(training_filepath)
     document = Document(id, training_filepath)
-    for token in tokens:
-      if not token in posting_lists:
-        posting_lists[token] = PostingList(token)
-      posting_lists[token].addDocument(document)
+    for term in terms:
+      if not term in posting_lists:
+        posting_lists[term] = PostingList(term)
+      posting_lists[term].addDocument(document)
   return posting_lists
 
 # writes postings lists to file
 def write_posting_lists(filename, posting_lists):
   with open(filename, 'w') as file:
-    file.writelines([" ".join([document.getId() for document in posting_list.getDocuments()]) + "\n" for posting_list in posting_lists])
+    file.writelines([" ".join([document.getId() for document in posting_list.getDocumentIds()]) + "\n" for posting_list in posting_lists])
 
 # accepts a dictionary of posting lists
 # returns a sorted array of posting lists which is consistent in dictionary and posting list file
@@ -66,7 +68,7 @@ def sorted_array_posting_list(posting_lists):
 # write dictionary
 def write_dictionary(filename, posting_lists):
   with open(filename, 'w') as file:
-    data = [(posting_list.getToken(), posting_list.getCount()) for posting_list in posting_lists]
+    data = [(posting_list.getTerm(), posting_list.getCount()) for posting_list in posting_lists]
     serialized = pickle.dumps(data)
     file.write(serialized)
 

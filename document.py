@@ -1,3 +1,4 @@
+# Represents a document
 class Document():
   def __init__(self, id, filepath):
     self.id = id

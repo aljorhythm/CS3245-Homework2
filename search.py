@@ -11,7 +11,7 @@ def read_queries(filename):
 # returns search results of query
 def search(query, dictionary, posting_file):
   query = Query(query)
-  results = query.getDocuments()
+  results = query.getDocumentIds()
   return results
 
 # write results to file
@@ -38,9 +38,9 @@ if __name__ == "__main__":
 
   file_reader = FileReader(postings_filename)
 
-  results = []
+  search_results = []
   for query in queries[:0]:
     search_result = search(query, dictionary, postings_filename)
     print search_result
     results.append(search_result)
-  write_results(search_results)
+  write_results(results_filename, search_results)

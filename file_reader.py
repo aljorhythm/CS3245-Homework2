@@ -1,6 +1,7 @@
 from line_reader import LineReader
 
 # File reader for postings
+# Seeks line by line
 # current_line_starting_position is always at the beginning of the line
 # line readers are initiated on seek, even if the line is not the target
 class FileReader():
@@ -11,8 +12,8 @@ class FileReader():
     self.line_readers = {}
 
   # if line reader doesn't exist, seek to line and create one
-  # line reader is always reset, do not use concurrently between two
-  # operations
+  # assumes that current
+  # line reader is always reset, do not use concurrently between two operations
   def getLineReader(self, line_number):
     if not line_number in self.line_readers:
       while True:
