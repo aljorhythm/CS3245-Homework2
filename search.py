@@ -2,6 +2,7 @@ import os
 import argparse
 from index import read_dictionary
 from file_reader import FileReader
+from query import Query
 
 # returns array of queries
 def read_queries(filename):
@@ -29,7 +30,7 @@ if __name__ == "__main__":
   args = vars(args)
 
   dictionary_filename = args["dictionary_filename"]
-  queries_filename = args["queries_filename"]
+  queries_filename = args["queries_filename"]  
   postings_filename = args["postings_filename"]
   results_filename = args["results_filename"]
 
@@ -38,8 +39,9 @@ if __name__ == "__main__":
 
   file_reader = FileReader(postings_filename)
 
+  print queries
   search_results = []
-  for query in queries[:0]:
+  for query in queries[:1]:
     search_result = search(query, dictionary, postings_filename)
     print search_result
     results.append(search_result)

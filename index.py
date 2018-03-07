@@ -41,9 +41,15 @@ def terms_from_file(filepath):
 
 # returns dict of vocabulary and corresponding posting list
 # can introduce a limit to the number of documents
+# also in the vocabulary is the term '' which posting list contains all the documents to be used for NOT
 def retrieve_posting_lists(training_directory, documents_limit=None):
   training_filepaths_and_ids = get_training_filepaths_and_ids(training_directory, documents_limit)
+  training_filepaths_and_ids = sorted(training_filepaths_and_ids, key=lambda x: int(x[1], 10))
+
   posting_lists = {}
+
+  posting_lists[''] = PostingList('')
+
   for training_filepath_and_id in training_filepaths_and_ids:
     training_filepath, id = training_filepath_and_id
     terms = terms_from_file(training_filepath)
@@ -52,6 +58,9 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
       if not term in posting_lists:
         posting_lists[term] = PostingList(term)
       posting_lists[term].addDocument(document)
+
+    posting_lists[''].addDocument(document)
+  
   return posting_lists
 
 # writes postings lists to file
@@ -65,15 +74,15 @@ def sorted_array_posting_list(posting_lists):
   return [posting_lists[key] for key in sorted(posting_lists.keys())]
 
 # accepts a sorted array of posting lists, see sorted_array_posting_list()
-# write dictionary
+# write terms information to dictionary
 def write_dictionary(filename, posting_lists):
   with open(filename, 'w') as file:
     data = [(posting_list.getTerm(), posting_list.getCount()) for posting_list in posting_lists]
     serialized = pickle.dumps(data)
     file.write(serialized)
 
-# accepts a sorted array of posting lists, see sorted_array_posting_list()
-# returns a sorted array of posting lists
+# accepts a sorted array of dictionary term information, see sorted_array_posting_list()
+# returns a sorted array of dictionary term information
 def read_dictionary(filename):
   with open(filename, 'r') as file:
     serialized = file.read()
@@ -83,8 +92,8 @@ def read_dictionary(filename):
 def dictionary_list_to_dict(dictionary_list):
   return { term[0] : { "line_number" : index + 1, "posting_counts" : term[1] } for index, term in enumerate(dictionary_list) }
 
-# returns a dictionary form of read_directory() so that term information
-# can be accessed with O(1)
+# returns a dictionary representation of read_dictionary() so that term information
+# can be accessed with O(1) in search
 def read_dictionary_dictionary(filename):
   array = read_dictionary(filename)
   return dictionary_list_to_dict(array)
