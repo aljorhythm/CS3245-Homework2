@@ -119,11 +119,14 @@ class Query():
     self.executeQuery()
 
   # ensures that operand is posting list that has a hasNextInt() method.
-  # if operand is a token the list will be retrieved after transforming it to a term
+  # if operand is a term the list will be retrieved after transforming it to a term
+  # if term is not in dictionary a empty list is returned
   def operandToPostingList(self, tokenOrList):
     if isinstance(tokenOrList, list):
       return NextableIntList(tokenOrList)
     term = self.tokenizer(tokenOrList)
+    if term not in self.terms:
+      return NextableIntList([])
     line_number = self.terms[term]["line_number"]
     return file_reader.getLineReader(line_number)
     
@@ -217,7 +220,17 @@ class Query():
         operands.append(calculation)
 
     assert len(operands) == 1, "Syntax wrong"
-    self.results = operands[0]
+
+    results = operands[0]
+    if results is not list:
+      posting_list = self.operandToPostingList(results)
+      results = []
+      while True:
+        nextInt = posting_list.nextInt()
+        if nextInt is None:
+          break
+        results.append(nextInt)
+    self.results = results
 
 if __name__ == "__main__":
   from index import term_from_token
@@ -278,5 +291,21 @@ if __name__ == "__main__":
   query_string = 'not (x and x)'
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 3, 5, 7, 8, 10], query.getDocumentIds()
+
+  query_string = 'a'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [], query.getDocumentIds()
+
+  query_string = 'z'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [4, 6], query.getDocumentIds()
+
+  query_string = 'a and z'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [], query.getDocumentIds()
+
+  query_string = 'a or z'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [4, 6], query.getDocumentIds()
 
   
