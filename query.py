@@ -1,3 +1,6 @@
+## Query operations
+## Shunting algo, merging lists
+
 from file_reader import FileReader
 import string
 from index import global_term
