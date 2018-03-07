@@ -268,6 +268,10 @@ if __name__ == "__main__":
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 6], query.getDocumentIds()
 
+  query_string = 'fifth and (third or fourth) and fifth'  
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [2, 6], query.getDocumentIds()
+
   query_string = 'fifth or z and (third or fourth)'
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 4, 6], query.getDocumentIds()
