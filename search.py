@@ -10,8 +10,14 @@ def read_queries(filename):
 
 # returns search results of query
 def search(query, dictionary, posting_file):
-  
-  return
+  query = Query(query)
+  results = query.getDocuments()
+  return results
+
+# write results to file
+def write_results(filename, results):
+  with open(filename, 'w') as file:
+    file.writelines("\n".join(results))
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Process some integers.')
@@ -30,6 +36,11 @@ if __name__ == "__main__":
   queries = read_queries(queries_filename)
   dictionary = read_dictionary(dictionary_filename)
 
+  file_reader = FileReader(postings_filename)
+
+  results = []
   for query in queries[:0]:
     search_result = search(query, dictionary, postings_filename)
     print search_result
+    results.append(search_result)
+  write_results(search_results)

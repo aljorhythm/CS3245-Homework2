@@ -22,9 +22,13 @@ def get_training_filepaths_and_ids(directory_of_documents, limit=None):
     break
   return filenames_all
 
+# transform term into token
+def term_from_token(token):
+  return ps.stem(token.lower())
+
 # transform tokens into terms
 def terms_from_tokens(tokens):
-  return map(lambda x: ps.stem(x.lower()), tokens)
+  return map(term_from_token, tokens)
 
 # get tokens from file
 # operations are sentence tokenizing, word tokenizing, case folding then stem
@@ -72,6 +76,16 @@ def read_dictionary(filename):
   with open(filename, 'r') as file:
     serialized = file.read()
     return pickle.loads(serialized)
+
+# used in read_dictionary_dictionary() to convert output from read_dictionary()
+def dictionary_list_to_dict(dictionary_list):
+  return { term[0] : { "line_number" : index + 1, "posting_counts" : term[1] } for index, term in enumerate(dictionary_list) }
+
+# returns a dictionary form of read_directory() so that term information
+# can be accessed with O(1)
+def read_dictionary_dictionary(filename):
+  array = read_dictionary(filename)
+  return dictionary_list_to_dict(array)
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Indexing')
