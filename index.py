@@ -66,15 +66,15 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
   
   return posting_lists
 
-# writes postings lists to file
-def write_posting_lists(filename, posting_lists):
-  with open(filename, 'w') as file:
-    file.writelines([" ".join([document.getId() for document in posting_list.getDocumentIds()]) + "\n" for posting_list in posting_lists])
-
 # accepts a dictionary of posting lists
 # returns a sorted array of posting lists which is consistent in dictionary and posting list file
 def sorted_array_posting_list(posting_lists):
   return [posting_lists[key] for key in sorted(posting_lists.keys())]
+
+# writes postings lists to file
+def write_posting_lists(filename, posting_lists):
+  with open(filename, 'w') as file:
+    file.writelines([" ".join([document.getId() for document in posting_list.getDocumentIds()]) + "\n" for posting_list in posting_lists])
 
 # accepts a sorted array of posting lists, see sorted_array_posting_list()
 # write terms information to dictionary
@@ -117,5 +117,6 @@ if __name__ == "__main__":
 
   posting_lists = retrieve_posting_lists(directory_of_documents, documents_limit)
   sorted_posting_lists = sorted_array_posting_list(posting_lists)
+
   write_posting_lists(postings_file, sorted_posting_lists)
   write_dictionary(dictionary_file, sorted_posting_lists)

@@ -5,6 +5,7 @@ Running the script by default runs the test
 
 1. file_reader.py
 2. query.py
+3. test_postings.txt - contains test postings for testing query algo
 
 Also for printing purposes, the dictionary file can be printed in a readable format using
 python print_dictionary.py dictionary.txt
