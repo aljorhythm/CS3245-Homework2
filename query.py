@@ -132,6 +132,8 @@ class Query():
     operand_1 = self.operandToPostingList(operand_1)
     operand_2 = global_term if operator.upper() == "NOT" else operand_2
     operand_2 = self.operandToPostingList(operand_2)
+    if operand_1 == operand_2:
+      return query_or(operand_1, self.operandToPostingList([]))
     if operator.lower() == 'and':
       return query_and(operand_1, operand_2)  
     elif operator.lower() == 'or':
@@ -179,9 +181,15 @@ class Query():
       elif is_operator and not is_parenthesis:
         while True:
           operators_len = len(operators)
-          if operators_len == 0 or (operators_len > 0 and get_operator_precedence(operators[-1]) >= operator_precedence):
+          if operators_len == 0 or (get_operator_precedence(operators[-1]) >= operator_precedence) or operand_or_operator.lower() == 'not':
+            if operators_len > 0 and operators[-1].lower() == 'not':
+              operator = operators.pop()
+              operand_1 = operands.pop()
+              calculation = self.operation(operand_1, operator, None)
+              operands.append(calculation)
             operators.append(operand_or_operator)
             break
+
           operator = operators.pop()
           operand_1 = operands.pop()
           operand_2 = operands.pop() if operator.upper() != "NOT" else None
@@ -189,7 +197,7 @@ class Query():
           operands.append(calculation)
       elif operand_or_operator == ')':
         while True:
-          if operators_len == 0 or (operators_len > 0 and get_operator_precedence(operators[-1]) >= operator_precedence):
+          if operators_len == 0 or (get_operator_precedence(operators[-1]) >= operator_precedence):
             break
           operator = operators.pop()
           operand_1 = operands.pop()
@@ -216,11 +224,20 @@ if __name__ == "__main__":
   from index import dictionary_list_to_dict
   
   assert query_or(NextableIntList([1]), NextableIntList([1])) == [1]
+  assert query_and(NextableIntList([1, 2]), NextableIntList([1, 2])) == [1, 2]
 
   filename = 'test_postings.txt'
   file_reader = FileReader(filename)
-  terms = [('x', 4), ('y', 3), ('z', 2), ('third', 3), ('fourth', 3), ('fifth', 2), ('', 10)]
+  terms = [('x', 4), ('y', 3), ('z', 2), ('third', 3), ('fourth', 3), ('fifth', 2), ('', 10), ('x2', 4)]
   terms = dictionary_list_to_dict(terms)
+
+  query_string = 'not x and x'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [], query.getDocumentIds()
+
+  query_string = 'x or not x and x'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [1, 4, 6, 9], query.getDocumentIds()
 
   query_string = 'x and y'
   query = Query(query_string, terms, file_reader, term_from_token)
@@ -231,13 +248,10 @@ if __name__ == "__main__":
   assert query.getDocumentIds() == [1, 3, 4, 6, 8, 9], query.getDocumentIds()
 
   query_string = '(third or fourth) and fifth'
-  print query_string
-  
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 6], query.getDocumentIds()
 
   query_string = 'fifth and (third or fourth)'  
-  print query_string
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 6], query.getDocumentIds()
 
@@ -248,3 +262,21 @@ if __name__ == "__main__":
   query_string = 'not x'
   query = Query(query_string, terms, file_reader, term_from_token)
   assert query.getDocumentIds() == [2, 3, 5, 7, 8, 10], query.getDocumentIds()
+
+  query_string = 'x or not x'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], query.getDocumentIds()
+
+  query_string = 'x and x2'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [1, 4, 6, 9], query.getDocumentIds()
+
+  query_string = 'x and x'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [1, 4, 6, 9], query.getDocumentIds()
+
+  query_string = 'not (x and x)'
+  query = Query(query_string, terms, file_reader, term_from_token)
+  assert query.getDocumentIds() == [2, 3, 5, 7, 8, 10], query.getDocumentIds()
+
+  
