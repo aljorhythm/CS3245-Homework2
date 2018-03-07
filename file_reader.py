@@ -9,6 +9,7 @@ class FileReader():
     self.line_number = 1
     self.current_line_starting_position = 0
     self.line_readers = {}
+
   # if line reader doesn't exist, seek to line and create one
   # line reader is always reset, do not use concurrently between two
   # operations
@@ -24,9 +25,11 @@ class FileReader():
     
     line_reader.resetCursor()
     return line_reader
+
   # returns current line that is read, 1-based
   def getCurrentLineNumber(self):
     return self.line_number
+
   # sets cursor to next line
   def seekNextLine(self):
     cursor = self.current_line_starting_position
@@ -38,9 +41,11 @@ class FileReader():
         break
     self.current_line_starting_position = cursor
     self.line_number += 1
+
   # returns current line reader
   def getCurrentLineReader(self):
     return self.getLineReader(self.getCurrentLineNumber())
+  
   # close
   def close(self):
     self.file.close()
