@@ -87,3 +87,4 @@ if __name__ == "__main__":
   sorted_posting_lists = sorted_array_posting_list(posting_lists)
   write_posting_lists(postings_file, sorted_posting_lists)
   write_dictionary(dictionary_file, sorted_posting_lists)
+  
