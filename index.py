@@ -22,11 +22,16 @@ def get_training_filepaths_and_ids(directory_of_documents, limit=None):
     break
   return filenames_all
 
+# transform tokens into terms
+def terms_from_tokens(tokens):
+  return map(lambda x: ps.stem(x.lower()), tokens)
+
 # get tokens from file
 # operations are sentence tokenizing, word tokenizing, case folding then stem
-def tokens_from_file(filepath):
+def terms_from_file(filepath):
   with open(filepath) as file:
-    return map(lambda x: ps.stem(x.lower()) ,list(chain.from_iterable([word_tokenize(sentence) for sentence in sent_tokenize(file.read())])))
+    tokens = list(chain.from_iterable([word_tokenize(sentence) for sentence in sent_tokenize(file.read())]))
+    return terms_from_tokens(tokens)
 
 # returns dict of vocabulary and corresponding posting list
 # can introduce a limit to the number of documents
@@ -35,7 +40,7 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
   posting_lists = {}
   for training_filepath_and_id in training_filepaths_and_ids:
     training_filepath, id = training_filepath_and_id
-    tokens = tokens_from_file(training_filepath)
+    tokens = terms_from_file(training_filepath)
     document = Document(id, training_filepath)
     for token in tokens:
       if not token in posting_lists:
@@ -46,7 +51,6 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
 # writes postings lists to file
 def write_posting_lists(filename, posting_lists):
   with open(filename, 'w') as file:
-    print [" ".join([document.getId() for document in posting_list.getDocuments()]) for posting_list in posting_lists]
     file.writelines([" ".join([document.getId() for document in posting_list.getDocuments()]) + "\n" for posting_list in posting_lists])
 
 # accepts a dictionary of posting lists
