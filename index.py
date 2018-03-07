@@ -70,7 +70,7 @@ def read_dictionary(filename):
     return pickle.loads(serialized)
 
 if __name__ == "__main__":
-  parser = argparse.ArgumentParser(description='Process some integers.')
+  parser = argparse.ArgumentParser(description='Indexing')
   parser.add_argument('-i', dest='directory_of_documents', help='no directory')
   parser.add_argument('-d', dest='dictionary_file', help='no dictionary file')
   parser.add_argument('-p', dest='postings_file', help='no postings file')
@@ -87,4 +87,3 @@ if __name__ == "__main__":
   sorted_posting_lists = sorted_array_posting_list(posting_lists)
   write_posting_lists(postings_file, sorted_posting_lists)
   write_dictionary(dictionary_file, sorted_posting_lists)
-  
