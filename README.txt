@@ -32,9 +32,24 @@ before
 
 == Files included with this submission ==
 
-List the files in your submission here and provide a short 1 line
-description of each file.  Make sure your submission's files are named
-and formatted correctly.
+document.py
+- Represents a document object, used during indexing
+
+file_reader.py
+- a file reader object that seeks to line positions quickly without reading
+
+index.py
+- main indexing file
+- contains tokenizer, term processing
+
+line_reader.py
+- a line reader to read to and fro a line of postings
+
+posting_list.py
+- represents a posting list, used during indexing
+
+print_dictionary.py
+- utility method to print readable format from serialized dictionary file, can ignore
 
 == Statement of individual work ==
 
