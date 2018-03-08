@@ -2,15 +2,33 @@ This is the README file for A0000000X's submission
 
 == Python Version ==
 
-I'm (We're) using Python Version <2.7.x or replace version number> for
+I'm (We're) using Python Version <2.7.10> for
 this assignment.
 
 == General Notes about this assignment ==
 
 1. Indexing
-  - Sentence are read from file
-  - Sentence is tokenized into word tokens
-  - Tokens are stemmed using porter
+  - Sentence are read from each file
+  - File information is stored (document id)
+  - Each sentence is tokenized into word tokens
+  - Tokens are stemmed using porter stemmer to create terms
+  - Terms are kept in a dictionary mapping of term to posting lists
+  - Add document to the posting list of the term
+  - After all the files are traversed
+    - posting lists and terms are sorted according to term alphabetically
+    - document ids in posting lists are also sorted
+    - posting lists are written to files
+    - dictionary is written to file, containing line number of posting list
+
+2. Searching
+  - for each query line
+  - use shunting yard algorithm
+  - on calculation operands can be either terms or lists,
+  if operand is term, retrieve line reader for corresponding line in
+  posting lists files
+  - last operand is results
+
+  gather all the results and print to output file
 
 Experiments
 ---------------------------------
@@ -29,8 +47,8 @@ Tests
 Unit Tests are available on some scripts.
 Running the script by default runs the test
 
-1. file_reader.py
-2. query.py
+1. file_reader.py - tests reading and seeking lines from file
+2. query.py - contains quite extensive testing of boolean query operations using test_postings.txt
 3. test_postings.txt - contains test postings for testing query algo
 
 Also for printing purposes, the dictionary file can be printed in a readable format using
@@ -41,6 +59,8 @@ Known Limitations or Bugs
 1. The file reader assumes that line number is always valid
 2. The file reader also assumes that a line reader will not be requested
 before
+3. Sunfire does not have nltk, so no stemming is used if nltk is not detected
+4. The seeking in line/file reader is rather naive, it might not take the shortest path
 
 == Files included with this submission ==
 
@@ -62,6 +82,12 @@ posting_list.py
 
 print_dictionary.py
 - utility method to print readable format from serialized dictionary file, can ignore
+
+query.py
+- abstract of boolean query operations
+
+argparse.py
+- because sunfire does not have argparse
 
 == Statement of individual work ==
 
