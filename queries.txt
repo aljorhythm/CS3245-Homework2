@@ -1,1 +1,0 @@
-product OR NOT (est AND sustain)
