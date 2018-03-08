@@ -1,8 +1,14 @@
 import os
 import argparse
-from index import read_dictionary
+from index import read_dictionary_dictionary
+from index import term_from_token
 from file_reader import FileReader
 from query import Query
+
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 # returns array of queries
 def read_queries(filename):
@@ -10,15 +16,17 @@ def read_queries(filename):
     return file.readlines()
 
 # returns search results of query
-def search(query, dictionary, posting_file):
-  query = Query(query)
+def search(query_string, dictionary, posting_file_reader, term_from_token):
+  query = Query(query_string, dictionary, posting_file_reader, term_from_token)
   results = query.getDocumentIds()
   return results
 
 # write results to file
 def write_results(filename, results):
   with open(filename, 'w') as file:
-    file.writelines("\n".join(results))
+    results = [" ".join([str(id) for id in document_ids]) for document_ids in results]
+    results_str = "\n".join(results)
+    file.writelines(results_str)
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Process some integers.')
@@ -35,14 +43,15 @@ if __name__ == "__main__":
   results_filename = args["results_filename"]
 
   queries = read_queries(queries_filename)
-  dictionary = read_dictionary(dictionary_filename)
+  dictionary = read_dictionary_dictionary(dictionary_filename)
 
-  file_reader = FileReader(postings_filename)
+  posting_file_reader = FileReader(postings_filename)
 
-  print queries
+  from nltk.stem import PorterStemmer
+  ps = PorterStemmer()
   search_results = []
-  for query in queries[:1]:
-    search_result = search(query, dictionary, postings_filename)
-    print search_result
-    results.append(search_result)
+  for query in queries:
+    query = query.strip('\n')
+    search_result = search(query, dictionary, posting_file_reader, term_from_token)
+    search_results.append(search_result)
   write_results(results_filename, search_results)
