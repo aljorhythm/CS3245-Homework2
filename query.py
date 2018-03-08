@@ -113,25 +113,27 @@ def get_operator_precedence(unit):
 
 # Represents a query, its operations and results
 class Query():
-  # terms are dictionary of term and term information pairs
-  def __init__(self, query, terms, file_reader, tokenizer):
+  # terms are dictionary of term and term information from dictionary file
+  def __init__(self, query, terms, file_reader, terminizer):
     self.query = query
     self.terms = terms
     self.file_reader = file_reader
-    self.tokenizer = tokenizer
+    self.terminizer = terminizer
     self.executeQuery()
 
-  # ensures that operand is posting list that has a hasNextInt() method.
+  # ensures that operand is posting list that has a nextInt() method.
   # if operand is a term the list will be retrieved after transforming it to a term
   # if term is not in dictionary a empty list is returned
   def operandToPostingList(self, tokenOrList):
     if isinstance(tokenOrList, list):
       return NextableIntList(tokenOrList)
-    term = self.tokenizer(tokenOrList)
+    
+    term = self.terminizer(tokenOrList)
+
     if term not in self.terms:
       return NextableIntList([])
     line_number = self.terms[term]["line_number"]
-    return file_reader.getLineReader(line_number)
+    return self.file_reader.getLineReader(line_number)
     
   # generic operation, handles automatically if operands(s) are token or result
   def operation(self, operand_1, operator, operand_2=None):
@@ -222,7 +224,7 @@ class Query():
         calculation = self.operation(operand_1, operator, operand_2)
         operands.append(calculation)
 
-    assert len(operands) == 1, "Syntax wrong"
+    assert len(operands) == 1, "Syntax wrong '{}' {}".format(self.query, operands)
 
     results = operands[0]
     if results is not list:
