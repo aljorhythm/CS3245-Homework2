@@ -108,7 +108,10 @@ def read_dictionary(filename):
 
 # used in read_dictionary_dictionary() to convert output from read_dictionary()
 def dictionary_list_to_dict(dictionary_list):
-  return { term[0] : { "line_number" : index + 1, "posting_counts" : term[1] } for index, term in enumerate(dictionary_list) }
+  dict_representation = {}
+  for index, term in enumerate(dictionary_list):
+    dict_representation[term[0]] = { "line_number" : index + 1, "posting_counts" : term[1] }
+  return dict_representation
 
 # returns a dictionary representation of read_dictionary() so that term information
 # can be accessed with O(1) in search
