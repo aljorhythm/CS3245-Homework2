@@ -11,6 +11,17 @@ Give an overview of your program, describe the important algorithms/steps
 in your program, and discuss your experiments in general.  A few paragraphs 
 are usually sufficient.
 
+Experiments
+---------------------------------
+
+Storing file as string and without implementing posting lists, the recorded output is:
+
+``````````````````````````````````
+➜  CS3245-Homework2 git:(master) ✗ python search.py -d dictionary.txt -p postings.txt -q queries.txt -o output.txt -t
+Started at 1520513786.14, ended at 1520513790.8, time taken: 4.66011214256
+➜  CS3245-Homework2 git:(master) ✗ ls -l output.txt
+-rw-r--r--  1 joellim  staff  464956 Mar  8 20:56 output.txt
+``````````````````````````````````
 
 Tests
 ---------------------------------
