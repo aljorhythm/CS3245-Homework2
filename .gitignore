@@ -1,1 +1,4 @@
 *.pyc
+output.txt
+result.txt
+expected_results.txt
