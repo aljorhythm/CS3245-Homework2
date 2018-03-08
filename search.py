@@ -26,9 +26,13 @@ def search(query_string, dictionary, posting_file_reader, term_from_token):
 # write results to file
 def write_results(filename, results):
   with open(filename, 'wb') as file:
-    for query_result in results:
-      for document_id in query_result:
-        struct.pack("i",1024)
+  # write bytes
+  #   for query_result in results:
+  #     for document_id in query_result:
+  #       packed = struct.pack("i", document_id)
+  #       file.write(packed)
+          
+  # write string
     results = [" ".join([str(id) for id in document_ids]) for document_ids in results]
     results_str = "\n".join(results)
     file.writelines(results_str)

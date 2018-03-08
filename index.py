@@ -11,6 +11,7 @@ try:
     import cPickle as pickle
 except:
     import pickle
+import struct
 
 ps = PorterStemmer()
 
@@ -18,18 +19,21 @@ ps = PorterStemmer()
 global_term = ''
 
 # returns tuples of training filepaths and their corresponding ids from a directory
-def get_training_filepaths_and_ids(directory_of_documents, limit=None):
+def get_training_filepaths_and_ids(directory_of_documents, limit=None, filter=None):
   filenames_all = []
   for (dirpath, dirnames, filenames) in os.walk(directory_of_documents):
     if limit is not None:
       filenames = filenames[0:limit]
+    if filter is not None:
+      filenames = [filename for filename in filenames if filename == filter]
     filenames_all.extend([(os.path.join(dirpath, filename), filename) for filename in filenames])
     break
   return filenames_all
 
 # transform term into token
 def term_from_token(token):
-  return ps.stem(token.lower())
+  after = ps.stem(token.lower())
+  return after
 
 # transform tokens into terms
 def terms_from_tokens(tokens):
@@ -40,7 +44,8 @@ def terms_from_tokens(tokens):
 def terms_from_file(filepath):
   with open(filepath) as file:
     tokens = list(chain.from_iterable([word_tokenize(sentence) for sentence in sent_tokenize(file.read())]))
-    return terms_from_tokens(tokens)
+    terms = terms_from_tokens(tokens)
+    return terms
 
 # returns dict of vocabulary and corresponding posting list
 # can introduce a limit to the number of documents
@@ -63,7 +68,7 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
       posting_lists[term].addDocument(document)
 
     posting_lists[global_term].addDocument(document)
-  
+
   return posting_lists
 
 # accepts a dictionary of posting lists
@@ -73,8 +78,18 @@ def sorted_array_posting_list(posting_lists):
 
 # writes postings lists to file
 def write_posting_lists(filename, posting_lists):
+  # by writing string
   with open(filename, 'w') as file:
-    file.writelines([" ".join([document.getId() for document in posting_list.getDocumentIds()]) + "\n" for posting_list in posting_lists])
+    file.writelines([" ".join([document.getId() for document in posting_list.getDocuments()]) + "\n" for posting_list in posting_lists])
+
+  # by writing bytes
+  # with open(filename, 'wb') as file:
+    # for posting_list in posting_lists:
+    #   for document in posting_list.getDocumentIds():
+    #     document_id = document.getId()
+    #     packed = struct.pack("i", int(document_id))
+    #     file.write(packed)
+    #   file.write('\n')
 
 # accepts a sorted array of posting lists, see sorted_array_posting_list()
 # write terms information to dictionary

@@ -11,6 +11,10 @@ class PostingList():
   # adds a document and keeps list sorted by document id
   def addDocument(self, document):
     self.documents.append(document)
-  # sorted posting list, unique set of document ids
+  # document ids
   def getDocumentIds(self):
+    documents = self.documents
+    return [document.getId() for document in documents]
+  # sorted posting list, unique set of document ids
+  def getDocuments(self):
     return sorted(set(self.documents), key=lambda document: int(document.getId(), 10))
