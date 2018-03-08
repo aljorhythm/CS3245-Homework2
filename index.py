@@ -3,8 +3,6 @@
 import argparse
 import os
 from itertools import chain
-from nltk.stem import PorterStemmer
-from nltk.tokenize import sent_tokenize, word_tokenize
 from posting_list import PostingList
 from document import Document
 try:
@@ -13,7 +11,19 @@ except:
     import pickle
 import struct
 
-ps = PorterStemmer()
+try:
+  from nltk.stem import PorterStemmer
+  from nltk.tokenize import sent_tokenize, word_tokenize
+  ps = PorterStemmer()
+  # transform term into token
+  def term_from_token(token):
+    after = ps.stem(token.lower())
+    return after
+except:
+  # transform term into token
+  def term_from_token(token):
+    return token
+  pass
 
 # Term that will return all documents
 global_term = ''
@@ -29,11 +39,6 @@ def get_training_filepaths_and_ids(directory_of_documents, limit=None, filter=No
     filenames_all.extend([(os.path.join(dirpath, filename), filename) for filename in filenames])
     break
   return filenames_all
-
-# transform term into token
-def term_from_token(token):
-  after = ps.stem(token.lower())
-  return after
 
 # transform tokens into terms
 def terms_from_tokens(tokens):
