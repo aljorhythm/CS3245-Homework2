@@ -17,6 +17,6 @@ class PostingList():
       self.term_frequencies[documentId] = TermFrequency(documentId)
     self.term_frequencies[documentId].incrementFrequency()
   # returns a posting list of term frequencies
-  def getDocuments(self):
+  def getTermFrequencies(self):
     self.documentIds = self.term_frequencies.keys()
     return [self.term_frequencies[documentId] for documentId in sorted(self.documentIds)]

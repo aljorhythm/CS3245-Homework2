@@ -81,16 +81,7 @@ def sorted_array_posting_list(posting_lists):
 def write_posting_lists(filename, posting_lists):
   # by writing string
   with open(filename, 'w') as file:
-    file.writelines([" ".join(["{}-{}".format(tf.getDocumentId(), tf.getFrequency()) for tf in posting_list.getDocuments()]) + "\n" for posting_list in posting_lists])
-
-  # by writing bytes
-  # with open(filename, 'wb') as file:
-    # for posting_list in posting_lists:
-    #   for document in posting_list.getDocumentIds():
-    #     document_id = document.getId()
-    #     packed = struct.pack("i", int(document_id))
-    #     file.write(packed)
-    #   file.write('\n')
+    file.writelines([" ".join(["{}-{}".format(tf.getDocumentId(), tf.getLogarithmicFrequency()) for tf in posting_list.getTermFrequencies()]) + "\n" for posting_list in posting_lists])
 
 # accepts a sorted array of posting lists, see sorted_array_posting_list()
 # write terms information to dictionary
