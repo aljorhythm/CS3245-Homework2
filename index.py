@@ -66,14 +66,10 @@ def retrieve_posting_lists(training_directory, documents_limit=None):
   for training_filepath_and_id in training_filepaths_and_ids:
     training_filepath, id = training_filepath_and_id
     terms = terms_from_file(training_filepath)
-    document = Document(id, training_filepath)
     for term in terms:
       if not term in posting_lists:
         posting_lists[term] = PostingList(term)
-      posting_lists[term].addDocument(document)
-
-    posting_lists[global_term].addDocument(document)
-
+      posting_lists[term].incrementTermFrequency(id)
   return posting_lists
 
 # accepts a dictionary of posting lists
@@ -85,7 +81,7 @@ def sorted_array_posting_list(posting_lists):
 def write_posting_lists(filename, posting_lists):
   # by writing string
   with open(filename, 'w') as file:
-    file.writelines([" ".join([document.getId() for document in posting_list.getDocuments()]) + "\n" for posting_list in posting_lists])
+    file.writelines([" ".join(["{}-{}".format(tf.getDocumentId(), tf.getFrequency()) for tf in posting_list.getDocuments()]) + "\n" for posting_list in posting_lists])
 
   # by writing bytes
   # with open(filename, 'wb') as file:
@@ -100,7 +96,7 @@ def write_posting_lists(filename, posting_lists):
 # write terms information to dictionary
 def write_dictionary(filename, posting_lists):
   with open(filename, 'w') as file:
-    data = [(posting_list.getTerm(), posting_list.getCount()) for posting_list in posting_lists]
+    data = [(posting_list.getTerm(), posting_list.getDocumentFrequency()) for posting_list in posting_lists]
     serialized = pickle.dumps(data)
     file.write(serialized)
 
