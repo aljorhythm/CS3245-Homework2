@@ -30,6 +30,10 @@ except:
   def sent_tokenize(sentences):
     return sentences.split(".")
 
+  # word_tokenize
+  def word_tokenize(sentence):
+    return sentence.split(" ")
+
 # Term that will return all documents
 global_term = ''
 
