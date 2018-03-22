@@ -26,6 +26,10 @@ except:
     return token
   pass
 
+  # sent_tokenize
+  def sent_tokenize(sentences):
+    return sentences.split(".")
+
 # Term that will return all documents
 global_term = ''
 
