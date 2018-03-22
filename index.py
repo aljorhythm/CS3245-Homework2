@@ -77,7 +77,9 @@ def write_dictionary(filename, indexer):
   terms = [(posting_list.getTerm(), posting_list.getDocumentFrequency()) for posting_list in posting_lists]
   document_lengths = indexer.document_lengths
   document_ids = sorted(document_lengths.keys(), key=lambda id_string: int(id_string))
-  document_ids_to_index = { document_id : index for index, document_id in enumerate(document_ids) }
+  document_ids_to_index = {}
+  for index, document_id in enumerate(document_ids):
+    document_ids_to_index[document_id] = index
 
   with open(filename, 'w') as file:
     data = {

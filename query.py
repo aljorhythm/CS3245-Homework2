@@ -66,7 +66,6 @@ class Query():
     top_indices = np.argpartition(scores, -limit)[-limit:]
     ranked = [{"document_id" : self.document_index_to_id[top_index], "score": scores[top_index]} for top_index in reversed(top_indices)]
     ranked = filter(lambda document_score: document_score["score"] > 0, ranked)
-    print [ds["score"] for ds in ranked]
     return ranked
 
   # execute query
