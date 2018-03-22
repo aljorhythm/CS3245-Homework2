@@ -1,4 +1,4 @@
-# create test data
+# create test data according to week 7 slides
 import os
 
 # create first file

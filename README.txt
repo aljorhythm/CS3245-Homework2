@@ -1,4 +1,4 @@
-This is the README file for A0000000X's submission
+This is the README file for A0140036X's submission
 
 == Python Version ==
 
@@ -7,40 +7,53 @@ this assignment.
 
 == General Notes about this assignment ==
 
+Stemming, case-folding are done but punctuations are not removed
+
 1. Indexing
   - Sentence are read from each file
   - File information is stored (document id)
   - Each sentence is tokenized into word tokens
   - Tokens are stemmed using porter stemmer to create terms
   - Terms are kept in a dictionary mapping of term to posting lists
-  - Add document to the posting list of the term
+  - Each term's frequency is incremented in the posting lists
+  - For each term frequency in each document
+    - frequency is logarthmically adjusted
+    - every document's length is calculated (cosine normalized) summing these logarthmic frequencies as term weights
+    - document length is recorded
+    - every term weight (logarthmic frequency) is normalized against document length
   - After all the files are traversed
-    - posting lists and terms are sorted according to term alphabetically
-    - document ids in posting lists are also sorted
-    - posting lists are written to files
-    - dictionary is written to file, containing line number of posting list
+    - document ids are mapped to document indexes in vector space
+    - written to dictionary file are
+      - term information (term to line number and document frequency)
+      - document lengths (normalized)
+      - number of documents in total
+      - document id to document index mapping
+    - written to the posting file are
+      - each line represents posting lists of a term
+      - example: "2-1.3" represents document 2 with weight 1.3, which is the lnc weight
 
 2. Searching
-  - for each query line
-  - use shunting yard algorithm
-  - on calculation operands can be either terms or lists,
-  if operand is term, retrieve line reader for corresponding line in
-  posting lists files
-  - last operand is results
+  - read information from dictionary file
+  - extract query terms from query
+  - initialize empty document vectors
+  - create query posting list (needed for ltc)
+  - fill query posting list and document vectors
+    - for each query term, get it's posting lists from posting list file
+      - fill corresponding document vector element with term weights in posting lists
+        - example: document id 1000 is at index 900, term weight is 2.3
+        - document_vectors[900] = 2.3
+      - increment term frequency in query posting list
+  - fill query vector
+    - for each query term
+      - tf: calculate inverse document frequency (using total number of documents and document frequency)
+      - idf: calculate logarthmic term frequency (using query posting list)
+      - add tf * idf to query vector
+  - calulate document scores
+    - document vector and query vector and pairwise multipled and summed
+  - top 10 documents with highest scores are returned
+    - documents with score of 0 are excluded
 
   gather all the results and print to output file
-
-Experiments
----------------------------------
-
-Storing file as string and without implementing posting lists, the recorded output is:
-
-``````````````````````````````````
-➜  CS3245-Homework2 git:(master) ✗ python search.py -d dictionary.txt -p postings.txt -q queries.txt -o output.txt -t
-Started at 1520513928.64, ended at 1520513932.88, time taken: 4.2426431179
-➜  CS3245-Homework2 git:(master) ✗ ls -l output.txt
--rw-r--r--  1 joellim  staff  464956 Mar  8 20:58 output.txt
-``````````````````````````````````
 
 Tests
 ---------------------------------
@@ -50,6 +63,7 @@ Running the script by default runs the test
 1. file_reader.py - tests reading and seeking lines from file
 2. query.py - contains quite extensive testing of boolean query operations using test_postings.txt
 3. test_postings.txt - contains test postings for testing query algo
+3. create_test_training.py - creates test training files according to week 7 slides
 
 Also for printing purposes, the dictionary file can be printed in a readable format using
 python print_dictionary.py dictionary.txt
@@ -76,6 +90,7 @@ index.py
 
 line_reader.py
 - a line reader to read to and fro a line of postings
+- postings are "<document id>-<term weight>" delimited by spaces
 
 posting_list.py
 - represents a posting list, used during indexing
@@ -84,16 +99,20 @@ print_dictionary.py
 - utility method to print readable format from serialized dictionary file, can ignore
 
 query.py
-- abstract of boolean query operations
+- abstract of free text query operations
 
 argparse.py
 - because sunfire does not have argparse
+
+Packages
+----------------------------------
+numpy, argparse, nltk
 
 == Statement of individual work ==
 
 Please initial one of the following statements.
 
-[x] I, A0000000X, certify that I have followed the CS 3245 Information
+[x] I, A0140036X, certify that I have followed the CS 3245 Information
 Retrieval class guidelines for homework assignments.  In particular, I
 expressly vow that I have followed the Facebook rule in discussing
 with others in doing the assignment and did not take notes (digital or
