@@ -24,7 +24,6 @@ except:
   # transform term into token
   def term_from_token(token):
     return token
-  pass
 
   # sent_tokenize
   def sent_tokenize(sentences):
@@ -32,7 +31,7 @@ except:
 
   # word_tokenize
   def word_tokenize(sentence):
-    return sentence.split(" ")
+    return sentencegit .split(" ")
 
 # Term that will return all documents
 global_term = ''
@@ -74,7 +73,7 @@ def write_posting_lists(filename, indexer):
   document_lengths = indexer.document_lengths
   # by writing string
   with open(filename, 'w') as file:
-    file.writelines([" ".join(["{}-{}".format(term_weight.getDocumentId(), term_weight.getNormalizedLogarithmicFrequency(document_lengths[term_weight.getDocumentId()])) for term_weight in posting_list.getTermWeights()]) + "\n" for posting_list in posting_lists])
+    file.writelines([" ".join(["{0}-{1}".format(term_weight.getDocumentId(), term_weight.getNormalizedLogarithmicFrequency(document_lengths[term_weight.getDocumentId()])) for term_weight in posting_list.getTermWeights()]) + "\n" for posting_list in posting_lists])
 
 # accepts a sorted array of posting lists, see sorted_array_posting_list()
 # write terms and other information to dictionary
