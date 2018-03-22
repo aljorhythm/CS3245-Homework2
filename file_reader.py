@@ -56,24 +56,25 @@ if __name__ == "__main__":
   assert file_reader.getCurrentLineNumber() == 1
   line_reader = file_reader.getCurrentLineReader()
 
-  assert line_reader.nextIntTuple() == [1, 1]
-  assert line_reader.nextIntTuple() == [4, 1]
-  assert line_reader.nextIntTuple() == [6, 2]
-  assert line_reader.nextIntTuple() == [9, 3]
-  assert line_reader.nextIntTuple() == None
+  print line_reader.nextIntFloatTuple()
+  assert line_reader.nextIntFloatTuple() == [1, 1]
+  assert line_reader.nextIntFloatTuple() == [4, 1]
+  assert line_reader.nextIntFloatTuple() == [6, 2]
+  assert line_reader.nextIntFloatTuple() == [9, 3]
+  assert line_reader.nextIntFloatTuple() == None
   assert file_reader.getCurrentLineNumber() == 1
 
   file_reader.seekNextLine()
   assert file_reader.getCurrentLineNumber() == 2
 
   line_reader_3 = file_reader.getLineReader(3)
-  assert line_reader_3.nextIntTuple() == [4, 4]
-  assert line_reader_3.nextIntTuple() == [6, 5]
-  assert line_reader_3.nextIntTuple() == None
-  assert line_reader_3.nextIntTuple() == None
+  assert line_reader_3.nextIntFloatTuple() == [4, 4]
+  assert line_reader_3.nextIntFloatTuple() == [6, 5]
+  assert line_reader_3.nextIntFloatTuple() == None
+  assert line_reader_3.nextIntFloatTuple() == None
 
   line_reader_2 = file_reader.getLineReader(2)
   
-  assert line_reader_2.nextIntTuples() == [[1, 2], [3, 4], [8, 9]]
+  assert line_reader_2.nextIntFloatTuples() == [[1, 2], [3, 4], [8, 9]]
   
   file_reader.close()

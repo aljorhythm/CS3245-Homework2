@@ -8,10 +8,10 @@ class LineReader():
     self.current_position = self.start_position
 
   # read all ints on the line
-  def allIntTuples(self):
+  def allIntFloatTuples(self):
     store_position = self.current_position
     self.resetCursor()
-    self.all_ints = self.nextIntTuple()
+    self.all_ints = self.nextIntFloatTuples()
     self.current_position = store_position
     return self.all_ints
 
@@ -20,8 +20,8 @@ class LineReader():
     self.current_position = self.start_position
 
   # get next integer on line, return None if end of line
-  def nextIntTuple(self):
-    nextIntTuple = []
+  def nextIntFloatTuple(self):
+    nextIntFloatTupleString = ""
     nextInt = ""
     
     while True:
@@ -29,30 +29,28 @@ class LineReader():
       nextChar = self.file.read(1)
       self.current_position += 1
       if nextChar is None or nextChar == '\n':
-        if nextInt.isdigit():
-          nextIntTuple.append(int(nextInt))
         self.current_position -= 1
         break
-      elif nextChar.isdigit():
-        nextInt += str(int(nextChar, 10))
-      elif nextChar == '-':
-        nextIntTuple.append(int(nextInt))
-        nextInt = ""
       elif nextChar == ' ':
-        nextIntTuple.append(int(nextInt))
         break
+      else:
+        nextIntFloatTupleString += nextChar
     
-    if nextIntTuple == []:
+    if nextIntFloatTupleString == "":
       return None
     
-    return nextIntTuple
+    try:
+      i, f = nextIntFloatTupleString.split("-")
+      return (int(i), float(f))
+    except:
+      assert False, "not correct format"
 
   # gets all integers from cursor onwards
-  def nextIntTuples(self):
-    intTuples = []
+  def nextIntFloatTuples(self):
+    IntFloatTuples = []
     while True:
-      next = self.nextIntTuple()
+      next = self.nextIntFloatTuple()
       if next == None:
         break
-      intTuples.append(next)
-    return intTuples
+      IntFloatTuples.append(next)
+    return IntFloatTuples

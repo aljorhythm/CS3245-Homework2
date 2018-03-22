@@ -1,7 +1,7 @@
 import os
 import argparse
 import time
-from index import read_dictionary_dictionary
+from index import read_dictionary
 from index import term_from_token
 from file_reader import FileReader
 from query import Query
@@ -17,24 +17,16 @@ def read_queries(filename):
   with open(filename) as file:
     return file.readlines()
 
-# returns search results of query
-def search(query_string, dictionary, posting_file_reader, term_from_token):
-  query = Query(query_string, dictionary, posting_file_reader, term_from_token)
-  results = query.getDocumentIds()
+# returns search results of query (top 10)
+def search(query_string, dictionary, posting_file_reader, term_from_token, number_of_documents):
+  query = Query(query_string, dictionary, posting_file_reader, term_from_token, number_of_documents)
+  results = query.getRankedDocumentScores(10)
   return results
 
 # write results to file
 def write_results(filename, results):
   with open(filename, 'wb') as file:
-  # write bytes
-  #   for query_result in results:
-  #     for document_id in query_result:
-  #       packed = struct.pack("i", document_id)
-  #       file.write(packed)
-          
-  # write string
-    results = [" ".join([str(id) for id in document_ids]) for document_ids in results]
-    results_str = "\n".join(results)
+    results_str = "\n".join([" ".join([str(document_score["document_id"]) for document_score in result]) for result in results])
     file.writelines(results_str)
 
 if __name__ == "__main__":
@@ -54,7 +46,10 @@ if __name__ == "__main__":
   timed = args["timed"]
 
   queries = read_queries(queries_filename)
-  dictionary = read_dictionary_dictionary(dictionary_filename)
+  dictionary = read_dictionary(dictionary_filename)
+  terms = dictionary["terms"]
+  number_of_documents = dictionary["meta"]["number_of_documents"]
+  document_ids_to_index = dictionary["document_ids_to_index"]
 
   posting_file_reader = FileReader(postings_filename)
 
@@ -63,7 +58,7 @@ if __name__ == "__main__":
   search_results = []
   for query in queries:
     query = query.strip('\n')
-    search_result = search(query, dictionary, posting_file_reader, term_from_token)
+    search_result = search(query, terms, posting_file_reader, term_from_token, document_ids_to_index)
     search_results.append(search_result)
 
   done = time.time()
